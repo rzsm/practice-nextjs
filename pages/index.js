@@ -1,53 +1,40 @@
+// Nice Smart Feature of NextJS:
+// recognizes the following import is for server-side code part of this file
+// so doesn't bundle it for sending to client-side
+import { MongoClient } from "mongodb"
 import MeetupList from "../components/meetups/MeetupList"
-
-const DummyMeetups = [
-	{
-		id: "m1",
-		title: "The First Meetup",
-		image:
-			"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShadNcghXHNWC9rKp7VgCTsMMVLpoReKIMCw&usqp=CAU",
-		address: "Some Address 202, 1666 Some City",
-		description: "This is a first meetup",
-	},
-	{
-		id: "m2",
-		title: "The Second Meetup",
-		image:
-			"https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Stpaul001.jpg/330px-Stpaul001.jpg",
-		address: "Some Address 204, 1646 Some City",
-		description: "This is a second meetup",
-	},
-]
 
 function HomePage(props) {
 	return <MeetupList meetups={props.meetups} />
 }
 
-// alternative for getStaticProps() (SSG) is SSR by getServerSideProps()
-// SSR = SSG : both are not sent to client-side, secure credentials can be used
-// SSR > SSG : accessing req and res objects
-// SSR > SSG : if you want to regenerate the page for every incoming request
-// SSG > SSR : SSG is faster, takes advantage of caching the ready pages, using CDNs
-// summary: if you need req or res, or data update frequency is more than per second ==> SSR
-// otherwise ==> SSG is better
-export async function getServerSideProps(context) {
-	const req = context.req
-	const res = context.res
-	// fetch data from an API
+export async function getStaticProps() {
+	// although NestJS let us use fetch in the server-side code,
+	// there is no need to, we can connect directly to the database here
+
+	const client = await MongoClient.connect(
+		"mongodb+srv://raziyeh:EIfW6FLlb6C13PHn@cluster0.fpf1nzr.mongodb.net/test"
+	);
+
+	const db = client.db();
+	const meetupsCollection = db.collection("meetups");
+	const meetups = await meetupsCollection.find().toArray();
+	console.log(meetups);
+
+	client.close();
+
 	return {
 		props: {
-			meetups: DummyMeetups,
+			meetups: meetups.map(meetup => {
+				return {
+					id: meetup._id.toString(),
+					image: meetup.image,
+					title: meetup.title,
+					address: meetup.address
+				}
+			}),
 		},
 	}
 }
-
-// export async function getStaticProps() {
-// 	// fetch data from an API
-// 	return {
-// 		props: {
-// 			meetups: DummyMeetups,
-// 		}
-// 	}
-// }
 
 export default HomePage

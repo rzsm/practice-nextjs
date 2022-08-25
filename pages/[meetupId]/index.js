@@ -1,3 +1,4 @@
+import { MongoClient, ObjectId } from 'mongodb';
 import MeetupDetail from "../../components/meetups/MeetupDetail"
 
 function MeetupDetailPage(props) {
@@ -13,41 +14,47 @@ function MeetupDetailPage(props) {
 
 export default MeetupDetailPage;
 
-// Dynamic page => getStaticPaths is required
-// fallback: false means all the possible paths are pre-rendered and are considred in paths array
-// fallback: true means, some of the most popular pages are pre-rendered, others will be pre-rendered by NextJS if they are requested.
 export async function getStaticPaths() {
-	// fetch path ids
+	const client = await MongoClient.connect(
+		"mongodb+srv://raziyeh:EIfW6FLlb6C13PHn@cluster0.fpf1nzr.mongodb.net/test"
+	);
+	const db = client.db();
+	const meetupCollections = db.collection('meetups');
+	const meetups = await meetupCollections.find({}, {_id:1}).toArray();
+	client.close();
 
 	return {
 		fallback: false,
-		paths: [
-			{
+		paths: meetups.map(meetup => {
+			return {
 				params: {
-					meetupId: "m1",
-				},
-			},
-			{
-				params: {
-					meetupId: "m2",
-				},
-			},
-		],
+					meetupId: meetup._id.toString()
+				}
+			}
+
+		})
+
 	}
 }
 
 export async function getStaticProps(context) {
-	const meetupId = context.params.meetupId
+	const meetupId = context.params.meetupId;
 
-	// fetch meeting datas of meetupId
+	const client = await MongoClient.connect(
+		"mongodb+srv://raziyeh:EIfW6FLlb6C13PHn@cluster0.fpf1nzr.mongodb.net/test"
+	);
+	const db = client.db();
+	const meetupCollections = db.collection('meetups');
+	const selectedMeetup = await meetupCollections.findOne({_id:ObjectId(meetupId)});
+	client.close();
 
 	return {
 		props: {
-			image:
-				"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShadNcghXHNWC9rKp7VgCTsMMVLpoReKIMCw&usqp=CAU",
-			title: "The First Meetup",
-			address: "Some Address 505, some City",
-			description: "Our first Meetup is held in ....",
+			id: meetupId,
+			image: selectedMeetup.image,
+			title: selectedMeetup.title,
+			address: selectedMeetup.address,
+			description: selectedMeetup.description
 		},
 	}
 }
