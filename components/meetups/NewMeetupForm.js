@@ -1,6 +1,8 @@
+// ReactJS
 import { useRef } from 'react';
-
+// Component
 import Card from '../ui/Card';
+// CSS
 import classes from './NewMeetupForm.module.css';
 
 function NewMeetupForm(props) {
@@ -31,8 +33,6 @@ function NewMeetupForm(props) {
   return (
     <Card>
       <form className={classes.form} onSubmit={submitHandler}>
-        {/* one big advantage of not using custom Input component: */}
-        {/* using useRef easily with ref and not things like forward ref */}
         <div className={classes.control}>
           <label htmlFor='title'>Meetup Title</label>
           <input type='text' required id='title' ref={titleInputRef} />

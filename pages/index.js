@@ -1,5 +1,8 @@
+// NextJS
 import Head from "next/head"
+// MongoDB
 import { MongoClient } from "mongodb"
+// Components
 import MeetupList from "../components/meetups/MeetupList"
 
 function HomePage(props) {
@@ -7,9 +10,11 @@ function HomePage(props) {
 		<>
 			<Head>
 				<title>React Meetups</title>
-				<meta name="description" content="Amazing React meetups provides wonderful network opportunities"/>
+				<meta
+					name="description"
+					content="Amazing React meetups provides wonderful network opportunities"
+				/>
 			</Head>
-			<MeetupList meetups={props.meetups} />
 			<MeetupList meetups={props.meetups} />
 		</>
 	)
@@ -23,7 +28,6 @@ export async function getStaticProps() {
 	const db = client.db()
 	const meetupsCollection = db.collection("meetups")
 	const meetups = await meetupsCollection.find().toArray()
-	console.log(meetups)
 
 	client.close()
 

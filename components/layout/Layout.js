@@ -1,4 +1,6 @@
+// Component
 import MainNavigation from './MainNavigation';
+// CSS
 import classes from './Layout.module.css';
 
 function Layout(props) {

@@ -1,4 +1,6 @@
+// NextJS
 import Link from 'next/link';
+// CSS
 import classes from './MainNavigation.module.css';
 
 function MainNavigation() {
