@@ -32,6 +32,7 @@ export async function getStaticProps() {
 	client.close()
 
 	return {
+		revalidate:10,
 		props: {
 			meetups: meetups.map((meetup) => {
 				return {
